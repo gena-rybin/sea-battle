@@ -17,6 +17,9 @@ window.onload  = function () {
     var data = [];
     var x=0;
     var y=0;
+
+
+    var yy=0;
     console.log(gameCell);
 
     //style settings
