@@ -1,0 +1,39 @@
+.wrapper {display: inline-block;}
+.gameRows, .harbor {
+     display: table;
+    }
+.gameRow, .ships {display: table-row;}
+.gameCell {
+    border: 1px solid grey ;
+    margin: 0;
+    height: 1.1em;
+    line-height: 1.1em;
+    width: 1.1em;
+    border-radius:2px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    color: darkgrey;
+}
+.space {
+    display: inline-block;
+    width: 20px;
+}
+.harbor {
+    margin-left: 50px;
+}
+.ships {
+    height: 45px;
+}
+.ship {
+    display: inline-block;
+    margin-left: 20px;
+    background-color: #35b1a2;
+}
+.free {background-color: rgb(227, 247, 255); }
+.hover {
+    border: none;
+    padding: 1px;
+    background-color: gold;
+    border-radius: 0;
+}
