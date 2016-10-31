@@ -1,19 +1,21 @@
 .wrapper {display: inline-block;}
-.gameRows, .harbor {
+.gameRows {
      display: table;
     }
-.gameRow, .ships {display: table-row;}
-.gameCell {
+.gameRow {display: table-row;}
+.gameCell, .shipCell {
     border: 1px solid grey ;
     margin: 0;
     height: 1.1em;
     line-height: 1.1em;
     width: 1.1em;
     border-radius:2px;
-    display: table-cell;
     text-align: center;
     vertical-align: middle;
     color: darkgrey;
+}
+.gameCell {
+    display: table-cell;
 }
 .space {
     display: inline-block;
@@ -21,8 +23,10 @@
 }
 .harbor {
     margin-left: 50px;
+    display: inline-block;
 }
 .ships {
+    display: block;
     height: 45px;
 }
 .ship {
@@ -30,10 +34,22 @@
     margin-left: 20px;
     background-color: #35b1a2;
 }
+.shipCell {
+    display: inline-block;
+}
 .free {background-color: rgb(227, 247, 255); }
 .hover {
     border: none;
     padding: 1px;
     background-color: gold;
     border-radius: 0;
+}
+.checked {
+    background-color: gold !important;
+}
+.shipCell {
+    display: inline-block;
+}
+.vertical {
+    display: block !important;
 }
