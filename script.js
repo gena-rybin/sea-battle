@@ -82,7 +82,7 @@ window.onload  = function () {
     makeGameControl();
 
 
-    // making Data-array with mines
+    // making Data-array
     function makeGameData(height,width) {
         // create empty array
         data = [];
@@ -117,6 +117,7 @@ window.onload  = function () {
             divHarbor.appendChild(divShips);
             for (var j=1; j<=i; j++) {
                 divShip = divShip.cloneNode(false);
+                //divShip.classList.add('vertical');
                     for (var cell=5-i; cell>=1; cell--) {
                         divShipCell = divShipCell.cloneNode(false);
                         divShip.appendChild(divShipCell);
@@ -144,21 +145,22 @@ window.onload  = function () {
         //console.log('hovered: строка='+y+', ячейка='+x);
     }
 
-    var horiz = false;
-    var vert = true;
+    var horiz;
+  //  var vert = false;
 
     divCover.onmouseover = function(event) {
         getPosition();
         var cell = event.target;
+
         //event.target.classList.add("hover");
-        if (horiz==true) {
+        if (horiz==true) {  //cell.classList.contains('horizontal')
             for (var i=0; i<shipLength; i++) {
                 if (divGameRows.childNodes[y].childNodes[x+shipLength-1]) {
                     divGameRows.childNodes[y].childNodes[x+i].classList.add("hover");
                 }
             }  //if(data[y-1] && data[y-1][x-1] === 1)
         }
-        if (vert==true) {
+        if (horiz==false) {   //cell.classList.contains('vertical')
             for (var i = 0; i < shipLength; i++) {
                 if (divGameRows.childNodes[y + shipLength -1]) {
                     divGameRows.childNodes[y + i].childNodes[x].classList.add("hover");
@@ -166,8 +168,8 @@ window.onload  = function () {
             }
         }
         //gameCell[15].classList.add("hover");
-        //console.log('hovered: строка='+y+', ячейка='+x);
     }
+
     divCover.onmouseout = function(event) {
         var cell = event.target;
         cell.classList.remove("hover");
@@ -176,7 +178,7 @@ window.onload  = function () {
                 divGameRows.childNodes[y].childNodes[x+i].classList.remove("hover");
             }
         }
-        if (vert==true) {
+        if (horiz==false) {
             for (var i=1; i<shipLength; i++) {
                 //gameCell[10*y+x+10*i].classList.remove("hover");
                 divGameRows.childNodes[y+i].childNodes[x].classList.remove("hover");
@@ -189,14 +191,21 @@ window.onload  = function () {
     function arrangeShips(event) {
         removeClassFromNeighbors('checked');
         var shipActive = event.target.parentNode;
-        if (shipActive.className == 'ship') {    // ship checking
+        console.log(shipActive.classList.contains('horizontal'))
+        if (shipActive.classList.contains('ship')) {    // ship checking
             shipLength = shipActive.childNodes.length;
             shipActive.classList.add('checked');
-            // if (shipActive.classList.contains('vertical')) {
-            //     shipActive.classList.remove('vertical');
-            // }
-            // shipActive.classList.add('vertical');
-                //.vertical
+
+            if (shipActive.classList.contains('horizontal')) {
+                shipActive.classList.remove('horizontal');
+                shipActive.classList.add('vertical');
+                horiz=false;
+            } else {
+                shipActive.classList.add('horizontal');
+                shipActive.classList.remove('vertical');
+                horiz=true;
+            };
+
         }
 
     }

@@ -25,15 +25,26 @@
     margin-left: 50px;
     display: inline-block;
 }
+.harbor .ships:nth-child(2) {
+    height: 62px;
+}
+.harbor .ships:nth-child(3) {
+    height: 42px;
+}
+.harbor .ships:last-child {
+    height: 20px;
+}
 .ships {
     display: block;
-    height: 45px;
+    height: 80px;
 }
 .ship {
-    display: inline-block;
-    margin-left: 20px;
+    /*display: inline-block;*/
+    margin-left: 50px;
+    float:left;
     background-color: #35b1a2;
 }
+.ship:last-child:after{content:''; clear:both;}
 .shipCell {
     display: inline-block;
 }
@@ -47,9 +58,14 @@
 .checked {
     background-color: gold !important;
 }
-.shipCell {
-    display: inline-block;
-}
 .vertical {
-    display: block !important;
+    width:20px;
+}
+
+.vertical .shipCell {
+    display:block;
+}
+
+.horizontal {
+    /*transform: rotate(-90deg);*/
 }
