@@ -12,11 +12,13 @@
     border-radius:2px;
     text-align: center;
     vertical-align: middle;
-    color: darkgrey;
 }
+
 .gameCell {
     display: table-cell;
+    background-color: lightsalmon;
 }
+.
 .space {
     display: inline-block;
     width: 20px;
@@ -49,12 +51,15 @@
     display: inline-block;
 }
 .free {background-color: rgb(227, 247, 255); }
+.ship-ready {background-color: #35b1a2;}
+.ship-damaged {background-color: tomato !important; }
 .hover {
     border: none;
     padding: 1px;
     background-color: gold;
     border-radius: 0;
 }
+
 .checked {
     background-color: gold !important;
 }

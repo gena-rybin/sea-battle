@@ -18,10 +18,8 @@ window.onload  = function () {
     var x=0;
     var y=0;
     var shipLength = 0;
+    var horiz;
 
-
-    var yy=0;
-    console.log(gameCell);
 
     //style settings
     htmlA = "<style>";
@@ -145,29 +143,76 @@ window.onload  = function () {
         //console.log('hovered: строка='+y+', ячейка='+x);
     }
 
-    var horiz;
-  //  var vert = false;
 
     divCover.onmouseover = function(event) {
         getPosition();
         var cell = event.target;
-
-        //event.target.classList.add("hover");
-        if (horiz==true) {  //cell.classList.contains('horizontal')
+        if (horiz==true  && checkFreeCell()) {
             for (var i=0; i<shipLength; i++) {
-                if (divGameRows.childNodes[y].childNodes[x+shipLength-1]) {
                     divGameRows.childNodes[y].childNodes[x+i].classList.add("hover");
-                }
-            }  //if(data[y-1] && data[y-1][x-1] === 1)
-        }
-        if (horiz==false) {   //cell.classList.contains('vertical')
-            for (var i = 0; i < shipLength; i++) {
-                if (divGameRows.childNodes[y + shipLength -1]) {
-                    divGameRows.childNodes[y + i].childNodes[x].classList.add("hover");
-                }
             }
         }
-        //gameCell[15].classList.add("hover");
+        if (horiz==false  && checkFreeCell()) {
+            for (var i = 0; i < shipLength; i++) {
+                    divGameRows.childNodes[y + i].childNodes[x].classList.add("hover");
+            }
+        }
+
+        function checkFreeCell() {
+            if (cell.classList.contains('free')) {
+                if (shipLength==4) {
+                    if (horiz==true
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-1]
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-1].classList.contains('free')
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-2].classList.contains('free')
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-3].classList.contains('free')) {
+                            return true;
+                    }
+                    if (horiz==false
+                        && divGameRows.childNodes[y + shipLength -1]
+                        && divGameRows.childNodes[y + shipLength -1].childNodes[x].classList.contains('free')
+                        && divGameRows.childNodes[y + shipLength -2].childNodes[x].classList.contains('free')
+                        && divGameRows.childNodes[y + shipLength -3].childNodes[x].classList.contains('free')) {
+                            return true;
+                    }
+                }
+                if (shipLength==3) {
+                    if (horiz==true
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-1]
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-1].classList.contains('free')
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-2].classList.contains('free')) {
+                        return true;
+                    }
+                    if (horiz==false
+                        && divGameRows.childNodes[y + shipLength -1]
+                        && divGameRows.childNodes[y + shipLength -1].childNodes[x].classList.contains('free')
+                        && divGameRows.childNodes[y + shipLength -2].childNodes[x].classList.contains('free')) {
+                            return true;
+                    }
+
+                }
+                if (shipLength==2) {
+                    if (horiz==true
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-1]
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-1].classList.contains('free')
+                        && divGameRows.childNodes[y].childNodes[x+shipLength-2].classList.contains('free')) {
+                        return true;
+                    }
+                    if (horiz==false
+                        && divGameRows.childNodes[y + shipLength -1]
+                        && divGameRows.childNodes[y + shipLength -1].childNodes[x].classList.contains('free')
+                        && divGameRows.childNodes[y + shipLength -2].childNodes[x].classList.contains('free')) {
+                        return true;
+                    }
+
+                }
+                if (shipLength==1) {
+                    if (cell.classList.contains('free')) return true;
+                }
+                return false;
+            }
+            return false;
+        }
     }
 
     divCover.onmouseout = function(event) {
@@ -175,13 +220,16 @@ window.onload  = function () {
         cell.classList.remove("hover");
         if (horiz==true) {
             for (var i=1; i<shipLength; i++) {
-                divGameRows.childNodes[y].childNodes[x+i].classList.remove("hover");
+                if (divGameRows.childNodes[y].childNodes[x+i]) {
+                    divGameRows.childNodes[y].childNodes[x+i].classList.remove("hover");
+                }
             }
         }
         if (horiz==false) {
             for (var i=1; i<shipLength; i++) {
-                //gameCell[10*y+x+10*i].classList.remove("hover");
-                divGameRows.childNodes[y+i].childNodes[x].classList.remove("hover");
+                if (divGameRows.childNodes[y+i]) {
+                    divGameRows.childNodes[y+i].childNodes[x].classList.remove("hover");
+                }
             }
         }
     }
@@ -189,13 +237,11 @@ window.onload  = function () {
     // choose ship to set on the game's field
     divControl.addEventListener("click", arrangeShips);
     function arrangeShips(event) {
-        removeClassFromNeighbors('checked');
+        removeClassFromAllCells('checked');
         var shipActive = event.target.parentNode;
-        console.log(shipActive.classList.contains('horizontal'))
         if (shipActive.classList.contains('ship')) {    // ship checking
             shipLength = shipActive.childNodes.length;
             shipActive.classList.add('checked');
-
             if (shipActive.classList.contains('horizontal')) {
                 shipActive.classList.remove('horizontal');
                 shipActive.classList.add('vertical');
@@ -205,12 +251,10 @@ window.onload  = function () {
                 shipActive.classList.remove('vertical');
                 horiz=true;
             };
-
         }
-
     }
 
-    function removeClassFromNeighbors (name) {
+    function removeClassFromAllCells (name) {
         for (var i = 0; i<divHarbor.childNodes.length; i++) {
             for (var j = 0; j<divHarbor.childNodes[i].childNodes.length; j++) {
                 if (divHarbor.childNodes[i].childNodes[j].classList.contains(name)) {
@@ -221,4 +265,74 @@ window.onload  = function () {
     }
 
 
-}
+    // set ship on the game's field
+    divCover.addEventListener("click", putShip);
+    function putShip(event) {
+        var cell = event.target;
+        if ((cell.classList.contains('hover')) && horiz==true) {
+            for (var i=0; i<shipLength; i++) {
+                if (divGameRows.childNodes[y].childNodes[x+shipLength-1]) {
+                    divGameRows.childNodes[y].childNodes[x+i].classList.add("ship-ready");
+                    divGameRows.childNodes[y].childNodes[x+i].classList.remove("free");
+                    //markNeighborCellsAsBusy();
+                }
+            }
+        }
+        if ((cell.classList.contains('hover')) && horiz==false) {
+            for (var i = 0; i < shipLength; i++) {
+                if (divGameRows.childNodes[y + shipLength -1]) {
+                    divGameRows.childNodes[y + i].childNodes[x].classList.add("ship-ready");
+                    divGameRows.childNodes[y + i].childNodes[x].classList.remove("free");
+                    //markNeighborCellsAsBusy();
+                }
+            }
+        }
+    }
+
+    function markNeighborCellsAsBusy() {
+        var top_left = divGameRows.childNodes[y-1].childNodes[x-1];
+        var top_middle = divGameRows.childNodes[y-1].childNodes[x];
+
+        if(divGameRows.childNodes[y-1]  && divGameRows.childNodes[y-1].childNodes[x-1].contains('free')) {
+                divGameRows.childNodes[y-1].childNodes[x-1].classList.add('busy');
+                divGameRows.childNodes[y-1].childNodes[x-1].classList.remove('free');
+        }
+        if(divGameRows.childNodes[y-1]  && top_middle.contains('free')) {
+                top_middle.classList.add('busy');
+                top_middle.remove('free');
+        }
+        if(divGameRows.childNodes[y-1]
+            && divGameRows.childNodes[y-1].childNodes[x+1].contains('free')) {
+                divGameRows.childNodes[y-1].childNodes[x+1].classList.add('busy');
+                divGameRows.childNodes[y-1].childNodes[x+1].remove('free');
+        }
+        if(divGameRows.childNodes[y]
+            && divGameRows.childNodes[y].childNodes[x-1].contains('free')) {
+                divGameRows.childNodes[y].childNodes[x-1].classList.add('busy');
+                divGameRows.childNodes[y].childNodes[x-1].remove('free');
+        }
+        if(divGameRows.childNodes[y]
+            && divGameRows.childNodes[y].childNodes[x+1].contains('free')) {
+                divGameRows.childNodes[y].childNodes[x+1].classList.add('busy');
+                divGameRows.childNodes[y].childNodes[x+1].remove('free');
+        }
+        if(divGameRows.childNodes[y+1]
+            && divGameRows.childNodes[y+1].childNodes[x-1].contains('free')) {
+                divGameRows.childNodes[y+1].childNodes[x-1].classList.add('busy');
+                divGameRows.childNodes[y+1].childNodes[x-1].remove('free');
+        }
+        if(divGameRows.childNodes[y+1]
+            && divGameRows.childNodes[y+1].childNodes[x].contains('free')) {
+                divGameRows.childNodes[y+1].childNodes[x].classList.add('busy');
+                divGameRows.childNodes[y+1].childNodes[x].remove('free');
+        }
+        if(divGameRows.childNodes[y+1]
+            && divGameRows.childNodes[y+1].childNodes[x+1].contains('free')) {
+                divGameRows.childNodes[y+1].childNodes[x+1].classList.add('busy');
+                divGameRows.childNodes[y+1].childNodes[x+1].remove('free');
+        }
+
+    }
+
+
+    }
