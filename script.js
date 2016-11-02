@@ -94,7 +94,7 @@ window.onload  = function () {
     }
 
 
-    // actions - makes game field
+    // makes game field
     function makeGameField(height, width) {
         for (var i=1; i<=height; i++) {
             divGameRow = divGameRow.cloneNode(false);
@@ -108,14 +108,13 @@ window.onload  = function () {
     }
 
 
-    // actions - makes ships to pose
+    // makes ships for posing at the game'field
     function makeGameControl() {
         for (var i=1; i<=4; i++) {
             divShips = divShips.cloneNode(false);
             divHarbor.appendChild(divShips);
             for (var j=1; j<=i; j++) {
                 divShip = divShip.cloneNode(false);
-                //divShip.classList.add('vertical');
                     for (var cell=5-i; cell>=1; cell--) {
                         divShipCell = divShipCell.cloneNode(false);
                         divShip.appendChild(divShipCell);
@@ -128,7 +127,7 @@ window.onload  = function () {
     }
 
 
-    // gets the position of clicked cell
+    // gets the position of the clicked cell
     function getPosition() {
         event.target.parentNode.childNodes.forEach(function(item, i) {
             if (item === event.target) {
@@ -147,73 +146,67 @@ window.onload  = function () {
     divCover.onmouseover = function(event) {
         getPosition();
         var cell = event.target;
-        if (horiz==true  && checkFreeCell()) {
+        if (horiz==true  && checkFreeCell() && checkNeighborShips()) {
             for (var i=0; i<shipLength; i++) {
                     divGameRows.childNodes[y].childNodes[x+i].classList.add("hover");
             }
         }
-        if (horiz==false  && checkFreeCell()) {
+        if (horiz==false  && checkFreeCell() && checkNeighborShips()) {
             for (var i = 0; i < shipLength; i++) {
                     divGameRows.childNodes[y + i].childNodes[x].classList.add("hover");
             }
         }
+    }
 
-        function checkFreeCell() {
-            if (cell.classList.contains('free')) {
-                if (shipLength==4) {
-                    if (horiz==true
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-1]
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-1].classList.contains('free')
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-2].classList.contains('free')
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-3].classList.contains('free')) {
-                            return true;
-                    }
-                    if (horiz==false
-                        && divGameRows.childNodes[y + shipLength -1]
-                        && divGameRows.childNodes[y + shipLength -1].childNodes[x].classList.contains('free')
-                        && divGameRows.childNodes[y + shipLength -2].childNodes[x].classList.contains('free')
-                        && divGameRows.childNodes[y + shipLength -3].childNodes[x].classList.contains('free')) {
-                            return true;
-                    }
-                }
-                if (shipLength==3) {
-                    if (horiz==true
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-1]
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-1].classList.contains('free')
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-2].classList.contains('free')) {
-                        return true;
-                    }
-                    if (horiz==false
-                        && divGameRows.childNodes[y + shipLength -1]
-                        && divGameRows.childNodes[y + shipLength -1].childNodes[x].classList.contains('free')
-                        && divGameRows.childNodes[y + shipLength -2].childNodes[x].classList.contains('free')) {
-                            return true;
-                    }
 
+    function checkFreeCell() {
+        if (data[y][x] == 0) {
+            if (shipLength==4) {
+                if (horiz==true
+                    && data[y][x+shipLength-1]==0
+                    && data[y][x+shipLength-2]==0
+                    && data[y][x+shipLength-3]==0) {
+                    return true;
                 }
-                if (shipLength==2) {
-                    if (horiz==true
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-1]
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-1].classList.contains('free')
-                        && divGameRows.childNodes[y].childNodes[x+shipLength-2].classList.contains('free')) {
-                        return true;
-                    }
-                    if (horiz==false
-                        && divGameRows.childNodes[y + shipLength -1]
-                        && divGameRows.childNodes[y + shipLength -1].childNodes[x].classList.contains('free')
-                        && divGameRows.childNodes[y + shipLength -2].childNodes[x].classList.contains('free')) {
-                        return true;
-                    }
-
+                if (horiz==false
+                    && data[y + shipLength -1][x]==0
+                    && data[y + shipLength -2][x]==0
+                    && data[y + shipLength -3][x]==0) {
+                    return true;
                 }
-                if (shipLength==1) {
-                    if (cell.classList.contains('free')) return true;
-                }
-                return false;
             }
+            if (shipLength==3) {
+                if (horiz==true
+                    && data[y][x+shipLength-1]==0
+                    && data[y][x+shipLength-2]==0) {
+                    return true;
+                }
+                if (horiz==false
+                    && data[y + shipLength -1]
+                    && data[y + shipLength -1][x]==0
+                    && data[y + shipLength -2][x]==0) {
+                    return true;
+                }
+            }
+            if (shipLength==2) {
+                if (horiz==true
+                    && data[y][x+shipLength-1]==0
+                    && data[y][x+shipLength-2]==0) {
+                    return true;
+                }
+                if (horiz==false
+                    && data[y + shipLength -1]
+                    && data[y + shipLength -1][x]==0
+                    && data[y + shipLength -2][x]==0) {
+                    return true;
+                }
+            }
+            if (shipLength==1)     return true;
             return false;
         }
+        return false;
     }
+
 
     divCover.onmouseout = function(event) {
         var cell = event.target;
@@ -269,70 +262,112 @@ window.onload  = function () {
     divCover.addEventListener("click", putShip);
     function putShip(event) {
         var cell = event.target;
-        if ((cell.classList.contains('hover')) && horiz==true) {
+        if ( horiz==true && checkFreeCell() && checkNeighborShips()) {
             for (var i=0; i<shipLength; i++) {
-                if (divGameRows.childNodes[y].childNodes[x+shipLength-1]) {
-                    divGameRows.childNodes[y].childNodes[x+i].classList.add("ship-ready");
-                    divGameRows.childNodes[y].childNodes[x+i].classList.remove("free");
-                    //markNeighborCellsAsBusy();
-                }
+                data[y][x+i] = shipLength;
+                showShipsOnTheField();
             }
         }
-        if ((cell.classList.contains('hover')) && horiz==false) {
+        if ( horiz==false  && checkFreeCell() && checkNeighborShips()) {
             for (var i = 0; i < shipLength; i++) {
-                if (divGameRows.childNodes[y + shipLength -1]) {
-                    divGameRows.childNodes[y + i].childNodes[x].classList.add("ship-ready");
-                    divGameRows.childNodes[y + i].childNodes[x].classList.remove("free");
-                    //markNeighborCellsAsBusy();
+                data[y + i][x] = shipLength;
+                showShipsOnTheField();
+            }
+        }
+        console.table(data);
+    }
+
+    
+    function showShipsOnTheField() {
+        for(var i=0; i<height; i++){
+            for(var j=0; j<width; j++){
+                if (data[i][j] != 0) {
+                    divGameRows.childNodes[i].childNodes[j].classList.add("ship-ready");
+                    divGameRows.childNodes[i].childNodes[j].classList.remove("free");
                 }
             }
         }
     }
 
-    function markNeighborCellsAsBusy() {
-        var top_left = divGameRows.childNodes[y-1].childNodes[x-1];
-        var top_middle = divGameRows.childNodes[y-1].childNodes[x];
 
-        if(divGameRows.childNodes[y-1]  && divGameRows.childNodes[y-1].childNodes[x-1].contains('free')) {
-                divGameRows.childNodes[y-1].childNodes[x-1].classList.add('busy');
-                divGameRows.childNodes[y-1].childNodes[x-1].classList.remove('free');
+    function checkNeighborShips() {
+        if (checkCell(y, x)) {
+            if (shipLength == 4) {
+                if (horiz == true
+                    && checkCell(y, x + 1)
+                    && checkCell(y, x + 2)
+                    && checkCell(y, x + 3))  {
+                    return true;
+                }
+                if (horiz == false
+                    && data[y + 3]
+                    && checkCell(y + 1, x)
+                    && checkCell(y + 2, x)
+                    && checkCell(y + 3, x)) {
+                    return true;
+                }
+            }
+            if (shipLength == 3) {
+                if (horiz == true
+                    && checkCell(y, x + 1)
+                    && checkCell(y, x + 2)) {
+                    return true;
+                }
+                if (horiz == false
+                    && data[y + 2]
+                    && checkCell(y + 1, x)
+                    && checkCell(y + 2, x)) {
+                    return true;
+                }
+            }
+            if (shipLength == 2) {
+                if (horiz == true
+                    && checkCell(y, x + 1)) {
+                    return true;
+                }
+                if (horiz == false
+                    && data[y + 1]
+                    && checkCell(y + 1, x)) {
+                    return true;
+                }
+            }
+            if (shipLength == 1)    return true;
+
+            return false;
         }
-        if(divGameRows.childNodes[y-1]  && top_middle.contains('free')) {
-                top_middle.classList.add('busy');
-                top_middle.remove('free');
-        }
-        if(divGameRows.childNodes[y-1]
-            && divGameRows.childNodes[y-1].childNodes[x+1].contains('free')) {
-                divGameRows.childNodes[y-1].childNodes[x+1].classList.add('busy');
-                divGameRows.childNodes[y-1].childNodes[x+1].remove('free');
-        }
-        if(divGameRows.childNodes[y]
-            && divGameRows.childNodes[y].childNodes[x-1].contains('free')) {
-                divGameRows.childNodes[y].childNodes[x-1].classList.add('busy');
-                divGameRows.childNodes[y].childNodes[x-1].remove('free');
-        }
-        if(divGameRows.childNodes[y]
-            && divGameRows.childNodes[y].childNodes[x+1].contains('free')) {
-                divGameRows.childNodes[y].childNodes[x+1].classList.add('busy');
-                divGameRows.childNodes[y].childNodes[x+1].remove('free');
-        }
-        if(divGameRows.childNodes[y+1]
-            && divGameRows.childNodes[y+1].childNodes[x-1].contains('free')) {
-                divGameRows.childNodes[y+1].childNodes[x-1].classList.add('busy');
-                divGameRows.childNodes[y+1].childNodes[x-1].remove('free');
-        }
-        if(divGameRows.childNodes[y+1]
-            && divGameRows.childNodes[y+1].childNodes[x].contains('free')) {
-                divGameRows.childNodes[y+1].childNodes[x].classList.add('busy');
-                divGameRows.childNodes[y+1].childNodes[x].remove('free');
-        }
-        if(divGameRows.childNodes[y+1]
-            && divGameRows.childNodes[y+1].childNodes[x+1].contains('free')) {
-                divGameRows.childNodes[y+1].childNodes[x+1].classList.add('busy');
-                divGameRows.childNodes[y+1].childNodes[x+1].remove('free');
+        return false;
+
+        function checkCell(row, column) {
+            if(data[row-1] && data[row-1][column-1]>0) {
+                return false;
+            }
+            if(data[row-1] && data[row-1][column]>0) {
+                return false;
+            }
+            if(data[row-1] && data[row-1][column+1]>0) {
+                return false;
+            }
+            if(data[row] && data[row][column-1]>0) {
+                return false;
+            }
+            if(data[row] && data[row][column+1]>0) {
+                return false;
+            }
+            if(data[row+1] && data[row+1][column-1]>0) {
+                return false;
+            }
+            if(data[row+1] && data[row+1][column]>0) {
+                return false;
+            }
+            if(data[row+1] && data[row+1][column+1]>0) {
+                return false;
+            }
+            return true;
         }
 
     }
+
+
 
 
     }
