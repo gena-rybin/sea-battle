@@ -1,4 +1,6 @@
-.wrapper {display: inline-block;}
+.wrapper {
+    display: inline-block;
+}
 .gameRows {
      display: table;
     }
@@ -18,7 +20,6 @@
     display: table-cell;
     background-color: lightsalmon;
 }
-.
 .space {
     display: inline-block;
     width: 20px;
@@ -26,6 +27,7 @@
 .harbor {
     margin-left: 50px;
     display: inline-block;
+    position: relative;
 }
 .harbor .ships:nth-child(2) {
     height: 62px;
@@ -52,7 +54,7 @@
 }
 .free {background-color: rgb(227, 247, 255); }
 .ship-ready {background-color: #35b1a2;}
-.ship-damaged {background-color: tomato !important; }
+.busy {background-color: tomato !important; }
 .hover {
     border: none;
     padding: 1px;
@@ -73,4 +75,18 @@
 
 .horizontal {
     /*transform: rotate(-90deg);*/
+}
+.disabled {
+    visibility: hidden;
+}
+button {
+    width: 200px;
+    height: 60px;
+    border-radius: 4px;
+    font-weight: 900;
+    border: 1px solid tomato;
+    margin-left: 108px;
+    position: fixed;
+    top: 200px;
+    left: 200px;
 }

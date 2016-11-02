@@ -6,6 +6,7 @@ window.onload  = function () {
     var	h1 = document.createElement('h1');
     var	h2 = document.createElement('h2');
     var div = document.createElement('div');
+    var buttonRun = document.createElement('button');
 
     var wrapper = document.getElementsByClassName('wrapper');
     var cover = document.getElementsByClassName('cover')[0];
@@ -67,6 +68,11 @@ window.onload  = function () {
     divShipCell.classList.add("shipCell");
 
 
+    buttonRun.innerText = 'Начать игру';
+    buttonRun.classList.add('disabled');
+
+
+
 // page loading
     body.insertAdjacentHTML("afterBegin", htmlA+htmlB+htmlC); //add my js-<styles> to index.html
     body.appendChild(h1);
@@ -78,6 +84,7 @@ window.onload  = function () {
     body.appendChild(divWrapper.cloneNode(false));
     document.getElementsByClassName('wrapper')[1].appendChild(divControl);
     makeGameControl();
+    divControl.appendChild(buttonRun);
 
 
     // making Data-array
@@ -169,6 +176,7 @@ window.onload  = function () {
                     return true;
                 }
                 if (horiz==false
+                    && data[y + shipLength -1]
                     && data[y + shipLength -1][x]==0
                     && data[y + shipLength -2][x]==0
                     && data[y + shipLength -3][x]==0) {
@@ -230,7 +238,7 @@ window.onload  = function () {
     // choose ship to set on the game's field
     divControl.addEventListener("click", arrangeShips);
     function arrangeShips(event) {
-        removeClassFromAllCells('checked');
+        removeClassFromAllCells(divHarbor, 'checked');
         var shipActive = event.target.parentNode;
         if (shipActive.classList.contains('ship')) {    // ship checking
             shipLength = shipActive.childNodes.length;
@@ -243,15 +251,15 @@ window.onload  = function () {
                 shipActive.classList.add('horizontal');
                 shipActive.classList.remove('vertical');
                 horiz=true;
-            };
+            }
         }
     }
 
-    function removeClassFromAllCells (name) {
-        for (var i = 0; i<divHarbor.childNodes.length; i++) {
-            for (var j = 0; j<divHarbor.childNodes[i].childNodes.length; j++) {
-                if (divHarbor.childNodes[i].childNodes[j].classList.contains(name)) {
-                    divHarbor.childNodes[i].childNodes[j].classList.remove(name);
+    function removeClassFromAllCells(parentDiv, name) {
+        for (var i = 0; i<parentDiv.childNodes.length; i++) {
+            for (var j = 0; j<parentDiv.childNodes[i].childNodes.length; j++) {
+                if (parentDiv.childNodes[i].childNodes[j].classList.contains(name)) {
+                    parentDiv.childNodes[i].childNodes[j].classList.remove(name);
                 }
             }
         }
@@ -262,19 +270,39 @@ window.onload  = function () {
     divCover.addEventListener("click", putShip);
     function putShip(event) {
         var cell = event.target;
-        if ( horiz==true && checkFreeCell() && checkNeighborShips()) {
-            for (var i=0; i<shipLength; i++) {
-                data[y][x+i] = shipLength;
-                showShipsOnTheField();
-            }
+        if ( horiz==true
+            && checkFreeCell()
+            && checkNeighborShips()
+            && checkAvailableShip(shipLength)) {
+                for (var i=0; i<shipLength; i++) {
+                    data[y][x+i] = shipLength;
+                    showShipsOnTheField();
+                }
         }
-        if ( horiz==false  && checkFreeCell() && checkNeighborShips()) {
-            for (var i = 0; i < shipLength; i++) {
-                data[y + i][x] = shipLength;
-                showShipsOnTheField();
-            }
+        if ( horiz==false
+            && checkFreeCell()
+            && checkNeighborShips()
+            && checkAvailableShip(shipLength)) {
+                for (var i = 0; i < shipLength; i++) {
+                    data[y + i][x] = shipLength;
+                    showShipsOnTheField();
+                }
         }
         console.table(data);
+        if (!checkAvailableShip(shipLength)) {  // no free ships of selected type
+            divHarbor.childNodes[4-shipLength].classList.add('disabled');
+            divCover.classList.remove('hover');
+            showShipsOnTheField();
+        }
+        if (!checkAvailableShip(1)              // no free ships
+            && !checkAvailableShip(2)
+            && !checkAvailableShip(3)
+            && !checkAvailableShip(4)) {
+                divHarbor.classList.add("disabled");
+                buttonRun.classList.remove('disabled');
+        }
+
+
     }
 
     
@@ -368,6 +396,49 @@ window.onload  = function () {
     }
 
 
-
-
+    function checkAvailableShip(cells) {
+        if (cells==1) {  // 1-палубный
+            if (shipQuantity(cells)<4)  return true;
+        }
+        if (cells==2) {  // 2-палубный
+            if (shipQuantity(cells)<5)  return true;
+        }
+        if (cells==3) {  // 3-палубный
+            if (shipQuantity(cells)<4)  return true;
+        }
+        if (cells==4) {  // 4-палубный
+            if (shipQuantity(cells)<1)  return true;
+        }
+        return false;
     }
+
+    function shipQuantity(length) {
+        var count = 0;
+        for(var i=0; i<height; i++){
+            for(var j=0; j<width; j++){
+                if (data[i][j] === length) {
+                    count++;
+                    // divGameRows.childNodes[i].childNodes[j].classList.add("ship-ready");
+                    // divGameRows.childNodes[i].childNodes[j].classList.remove("free");
+                }
+            }
+        }
+        return count;
+    }
+
+
+    buttonRun.addEventListener("click", startShootings);
+    function startShootings(event) {
+        while (divGameRows.hasChildNodes()) {		// empty game field
+            divGameRows.removeChild(divGameRows.lastChild);
+        }
+        makeGameField(height,width);
+        buttonRun.classList.add('disabled');
+        divCover.removeEventListener("click", putShip);
+        divCover.onmouseover = function() {};
+        divCover.onmouseout = function() {};
+        console.table(data);
+    }
+
+
+}
