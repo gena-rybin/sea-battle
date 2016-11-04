@@ -157,12 +157,12 @@ window.onload  = function () {
     divGame.onmouseover = function(event) {
         getPosition();
         var cell = event.target;
-        if (horiz===true  && checkFreeCell() && checkNeighborShips()) {
+        if (horiz===true  && checkCellForValue(0) && checkNeighborShips()) {
             for (var i=0; i<shipLength; i++) {
                     divGameRows.childNodes[y].childNodes[x+i].classList.add("hover");
             }
         }
-        if (horiz===false  && checkFreeCell() && checkNeighborShips()) {
+        if (horiz===false  && checkCellForValue(0) && checkNeighborShips()) {
             for (var i = 0; i < shipLength; i++) {
                     divGameRows.childNodes[y + i].childNodes[x].classList.add("hover");
             }
@@ -173,46 +173,44 @@ window.onload  = function () {
     }
 
 
-    function checkFreeCell() {
-        if (data[y][x] === 0) {
+    function checkCellForValue(value) {
+        if (data[y][x] === value) {
             if (shipLength===4) {
                 if (horiz===true
-                    && data[y][x+shipLength-1]===0
-                    && data[y][x+shipLength-2]===0
-                    && data[y][x+shipLength-3]===0) {
+                    && data[y][x+3]===value
+                    && data[y][x+2]===value
+                    && data[y][x+1]===value) {
                     return true;
                 }
                 if (horiz===false
-                    && data[y + shipLength -1]
-                    && data[y + shipLength -1][x]===0
-                    && data[y + shipLength -2][x]===0
-                    && data[y + shipLength -3][x]===0) {
+                    && data[y + 3]
+                    && data[y + 3][x]===value
+                    && data[y + 2][x]===value
+                    && data[y + 1][x]===value) {
                     return true;
                 }
             }
             if (shipLength===3) {
                 if (horiz===true
-                    && data[y][x+shipLength-1]===0
-                    && data[y][x+shipLength-2]===0) {
+                    && data[y][x+2]===value
+                    && data[y][x+1]===value) {
                     return true;
                 }
                 if (horiz===false
-                    && data[y + shipLength -1]
-                    && data[y + shipLength -1][x]===0
-                    && data[y + shipLength -2][x]===0) {
+                    && data[y + 2]
+                    && data[y + 2][x]===value
+                    && data[y + 1][x]===value) {
                     return true;
                 }
             }
             if (shipLength===2) {
                 if (horiz===true
-                    && data[y][x+shipLength-1]===0
-                    && data[y][x+shipLength-2]===0) {
+                    && data[y][x+1]===value) {
                     return true;
                 }
                 if (horiz===false
-                    && data[y + shipLength -1]
-                    && data[y + shipLength -1][x]===0
-                    && data[y + shipLength -2][x]===0) {
+                    && data[y + 1]
+                    && data[y + 1][x]===value) {
                     return true;
                 }
             }
@@ -280,7 +278,7 @@ window.onload  = function () {
     function putShip(event) {
         var cell = event.target;
         if ( horiz==true
-            && checkFreeCell()
+            && checkCellForValue(0)
             && checkNeighborShips()
             && checkAvailableShip(shipLength)) {
                 for (var i=0; i<shipLength; i++) {
@@ -289,7 +287,7 @@ window.onload  = function () {
                 }
         }
         if ( horiz==false
-            && checkFreeCell()
+            && checkCellForValue(0)
             && checkNeighborShips()
             && checkAvailableShip(shipLength)) {
                 for (var i = 0; i < shipLength; i++) {
@@ -461,61 +459,338 @@ window.onload  = function () {
         var dataClone = [];
         dataClone = data;
         var cell = event.target;
-        var value = data[y][x];
-        var vertical = 0;
-        var horizontal = 0;
+        var shipLength = data[y][x];
+        var vertShip = 0;
+        var horizShip = 0;
+        var count = 0;
 
-        if (value > 0) {
+        console.log(shipLength);
+        if (shipLength > 0) {
             cell.innerText = 'X';
             opened++;
             h42.innerHTML = "Остаток палуб для открытия: " +(maxCells-opened);
-            //if (value===opened && checkCell(y,x))
 
-            if (value === 1) {
-                openNeighborCells(y,x);
+            if (shipLength === 1) {
+                openAllNeighborCells(y,x);
             }
             else {
                 data[y][x]=10;
-                if (value===2 && findInjured(y,x)) {
-                    openNeighborCells(y,x);
-                    if (vertical) {
-                        console.log('vert');
-                        openNeighborCells(y+vertical, x);
+                if (shipLength==2 && (findInjuredTR(y,x)||findInjuredBL(y,x))) {
+                    openAllNeighborCells(y, x);
+                    if (vertShip) {
+                        openAllNeighborCells(y + vertShip, x);
                     }
-                    if (horizontal) {
-                        console.log('horiz');
-                        openNeighborCells(y, x+horizontal);
+                    if (horizShip) {
+                        openAllNeighborCells(y, x + horizShip);
                     }
+                }
+                if (shipLength==4) {
+                    console.log(11);
+                    console.log(checkValue(10));
+                    checkFullOpened();
+                    console.log(22);
+                }
 
+            }
+///////=================
+//             else {
+//                 data[y][x]=10;
+//                 if (value===2 && findInjured(y,x)) {
+//                     openNeighborCells(y,x);
+//                     if (vertical) {
+//                         console.log('vert');
+//                         openNeighborCells(y+vertical, x);
+//                     }
+//                     if (horizontal) {
+//                         console.log('horiz');
+//                         openNeighborCells(y, x+horizontal);
+//                     }
+//
+//                 }
+//             }
+///////=================
+
+            //if 2 neighboring cells are opened
+            if ( countNeighborOpened()==2
+                &&(findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
+                if (vertShip) {
+                    openLeftRightCells(y,x);
+                    openLeftRightCells(y+1, x);
+                    openLeftRightCells(y-1, x);
+                }
+                if (horizShip) {
+                    openTopBotCells(y,x);
+                    openTopBotCells(y, x+1);
+                    openTopBotCells(y, x-1);
                 }
             }
+
+            //if 1 neighboring cell is opened
+            if (shipLength >2) {
+                data[y][x]=10;
+                if ( (findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
+                    if (vertShip) {
+                        openLeftRightCells(y,x);
+                        if (data[y+vertShip][x]=10)  {
+                            openLeftRightCells(y+vertShip, x);
+                        }
+                    }
+                    if (horizShip) {
+                        openTopBotCells(y,x);
+                        if (data[y][x+horizShip]=10)  {
+                            openTopBotCells(y, x+horizShip);
+                        }
+                    }
+                }
+            }
+
         }
         else {
             cell.innerHTML ='&#8226;'  ;
         }
 
 
-        function findInjured(yy, xx) {
+        //     for (var j=0; j<width; j++) {
+        //         for (var i = 0; i < height; i++) {
+        //             horizShip = 1;
+        //             vertShip = 0;
+        //             if (checkValue(10)) {
+        //                 openAllNeighborCells(y+j, x+i);
+        //             }
+        //         }
+        //     }
+        //
+        //
+        //                if (vertShip) {
+        //                 for (var i = 0; i < height; i++) {
+        //                     if (checkValue(10)) {
+        //                         openAllNeighborCells(y+i,x);
+        //                     }
+        //                 }
+        //             }
+        // }
+
+
+        // if ((shipLength >2) && findInjuredTR(y,x)) {
+            //     if (vertShip) {
+            //         openAllNeighborCells(y+vertShip, x);
+            //     }
+            //     if (horizShip) {
+            //         openAllNeighborCells(y, x+horizShip);
+            //     }
+            // }
+
+   /////////////////////////////////////////////////
+   //              if (findInjuredTR(y,x)) {
+   //                  if (vertShip) {
+   //                      if(data[y+vertShip] && data[y+vertShip][x] === 10) {
+   //                          openLeftRightCells(y+vertShip,x);
+   //                          openLeftRightCells(y,x);
+   //                      }
+   //                  }
+   //                  if (horizShip) {
+   //                      if(data[y] && data[y][x+horizShip] === 10) {
+   //                          openTopBotCells(y,x);
+   //                          openTopBotCells(y,x+horizShip);
+   //                      }
+   //                  }
+   //              }
+
+                //              ///////////////////////////
+   //              // var count1 = 0;
+   //              // var count2 = 0;
+   //              // // horizontal check
+   //              // if (horizShip) {
+   //              //     for (var i=0; i<width; i++) {
+   //              //         if (data[y][i] === 10) {
+   //              //             count1++;
+   //              //         }
+   //              //     }
+   //              // }
+   //              //
+   //              // // vertical check
+   //              // if (vertShip) {
+   //              //     for (var j=0; j<height; j++) {
+   //              //         if (arr[j][x] === 1) {
+   //              //             count2++;
+   //              //         }
+   //              //     }
+   //              // }
+               ////////////////////////////////
+
+/////////////////////////////////////////////////////////
+//                 if (shipLength===3) {
+//                     if (shipLength===3 && findInjuredTR(y,x)) {
+//                         if (vertShip) {
+//                             if(data[y+vertShip]
+//                                 && data[y+(vertShip*2)]
+//                                 && data[y+vertShip][x] === 10
+//                                 && data[y+(vertShip*2)][x] === 10) {
+//                                     openLeftRightCells(y,x);
+//                                     openLeftRightCells(y+vertShip,x);
+//                                     openLeftRightCells(y+(vertShip*2),x);
+//                             }
+//                         }
+//                         if (horizShip) {
+//                             if(data[y]
+//                                 && data[y][x+horizShip] === 10
+//                                 && data[y][x+(horizShip*2)] === 10) {
+//                                     openTopBotCells(y,x);
+//                                     openTopBotCells(y,x+horizShip);
+//                                     openTopBotCells(y,x+(horizShip*2));
+//                             }
+//                         }
+//                     }
+//                 }
+/////////////////////////////////////////////////////////////////
+        // check for full-opened ship
+        function checkFullOpened() {
+            console.log('in');
+            for (var i = 0; i < height; i++) {
+                horizShip = 0;
+                vertShip = 1;
+                if (data[i][x]
+                    && countNeighborOpened(i, x) === 1
+                    && countNeighborOpened(i + 1, x) === 2
+                    && countNeighborOpened(i + 2, x) === 2) {
+                    openAllNeighborCells(i + 1, x);
+                    openAllNeighborCells(i + 4, x);
+                }
+            }
+            for (var i = 0; i < width; i++) {
+                horizShip = 1;
+                vertShip = 0;
+                if (data[y][i]
+                    && countNeighborOpened(y, i) === 1
+                    && countNeighborOpened(y, i + 1) === 2
+                    && countNeighborOpened(y, i + 2) === 2) {
+                    openAllNeighborCells(y, i + 1);
+                    openAllNeighborCells(y, i + 4);
+                }
+            }
+
+        }
+
+        function countNeighborOpened() {
+            count = 0;
+            if(data[y-1] && data[y-1][x] === 10) {
+                count++;
+            }
+            if(data[y] && data[y][x-1] === 10) {
+                count++;
+            }
+            if(data[y] && data[y][x+1] === 10) {
+                count++;
+            }
+            if(data[y+1] && data[y+1][x] === 10) {
+                count++;
+            }
+            return count;
+        }
+
+    function checkValue(value) {
+        if (data[y][x] === value) {
+            if (shipLength===4) {
+                if (horizShip
+                    && data[y][x+3]===value
+                    && data[y][x+2]===value
+                    && data[y][x+1]===value) {
+                    return true;
+                }
+                if (vertShip
+                    && data[y + 3]
+                    && data[y + 3][x]===value
+                    && data[y + 2][x]===value
+                    && data[y + 1][x]===value) {
+                    return true;
+                }
+            }
+            if (shipLength===3) {
+                if (horizShip
+                    && data[y][x+2]===value
+                    && data[y][x+1]===value) {
+                    return true;
+                }
+                if (vertShip
+                    && data[y + 2]
+                    && data[y + 2][x]===value
+                    && data[y + 1][x]===value) {
+                    return true;
+                }
+            }
+            if (shipLength===2) {
+                if (horizShip
+                    && data[y][x+1]===value) {
+                    return true;
+                }
+                if (vertShip
+                    && data[y + 1]
+                    && data[y + 1][x]===value) {
+                    return true;
+                }
+            }
+            if (shipLength===1)     return true;
+            return false;
+        }
+        return false;
+    }
+
+        function openLeftRightCells(yy,xx) {
+            divGameRows.childNodes[yy].childNodes[xx+1].innerHTML ='&#8226;';
+            divGameRows.childNodes[yy].childNodes[xx-1].innerHTML ='&#8226;';
+        }
+        function openTopBotCells(yy,xx) {
+            divGameRows.childNodes[yy+1].childNodes[xx].innerHTML ='&#8226;';
+            divGameRows.childNodes[yy-1].childNodes[xx].innerHTML ='&#8226;';
+        }
+
+        //top-right
+        function findInjuredTR(yy, xx) {
+            //vertShip = 0;
+            //horizShip = 0;
             if(data[yy-1] && data[yy-1][xx] === 10) {
-                vertical = -1;
+                vertShip = -1;
                 return true;
             }
             if(data[yy] && data[yy][xx+1] === 10) {
-                horizontal = 1;
+                horizShip = 1;
                 return true;
             }
             if(data[yy+1] && data[yy+1][xx] === 10) {
-                vertical = 1;
+                vertShip = 1;
                 return true;
             }
             if(data[yy] && data[yy][xx-1] === 10) {
-                horizontal = -1;
+                horizShip = -1;
+                return true;
+            }
+            return false;
+        }
+        //bottom-left
+        function findInjuredBL(yy, xx) {
+            vertShip = 0;
+            horizShip = 0;
+            if(data[yy+1] && data[yy+1][xx] === 10) {
+                vertShip = 1;
+                return true;
+            }
+            if(data[yy] && data[yy][xx-1] === 10) {
+                horizShip = -1;
+                return true;
+            }
+            if(data[yy] && data[yy][xx+1] === 10) {
+                horizShip = 1;
+                return true;
+            }
+            if(data[yy-1] && data[yy-1][xx] === 10) {
+                vertShip = -1;
                 return true;
             }
             return false;
         }
 
-        function openNeighborCells(yy,xx) {
+
+        function openAllNeighborCells(yy,xx) {
             if(data[yy-1] && data[yy-1][xx-1] === 0) {
                 divGameRows.childNodes[yy-1].childNodes[xx-1].innerHTML ='&#8226;';
             }
