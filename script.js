@@ -456,61 +456,126 @@ window.onload  = function () {
 
     function shootings(event) {
         getPosition();
-        var dataClone = [];
-        dataClone = data;
         var cell = event.target;
         var shipLength = data[y][x];
         var vertShip = 0;
         var horizShip = 0;
         var count = 0;
+        console.log('y=' + y + ', x=' + x);
 
-        console.log(shipLength);
         if (shipLength > 0) {
             cell.innerText = 'X';
             opened++;
-            h42.innerHTML = "Остаток палуб для открытия: " +(maxCells-opened);
 
             if (shipLength === 1) {
+                data[y][x]=10;
                 openAllNeighborCells(y,x);
             }
             else {
                 data[y][x]=10;
-                if (shipLength==2 && (findInjuredTR(y,x)||findInjuredBL(y,x))) {
-                    openAllNeighborCells(y, x);
-                    if (vertShip) {
-                        openAllNeighborCells(y + vertShip, x);
-                    }
+/////////////////////////////////////////////////////////
+                var start = 0;
+                var end = 0;
+
+                if (shipLength===2 &&(findInjuredTR(y,x)||findInjuredBL(y,x))) {
                     if (horizShip) {
-                        openAllNeighborCells(y, x + horizShip);
+                        for (var i = 0; i < width; i++) { //горизонтальная проверка
+                            start = 0;
+                            end = 0;
+                            if ((data[y][i + 1] === 10) && (data[y][i + 1] === 10)) {
+                                start = i;
+                                end = i + 1;
+                            }
+                            if (start && end) {
+                                openAllNeighborCells(y, start);
+                                openAllNeighborCells(y, end);
+                            }
+                        }
+                    }
+                    if (vertShip) {
+                        for (var j = 0; j < height; j++) { //вертикальная проверка
+                            start = 0;
+                            end = 0;
+                            if (data[j + 1][x] && (data[j][x] === 10) && (data[j + 1][x] === 10)) {
+                                start = j;
+                                end = j + 1;
+                            }
+                            if (start && end) {
+                                openAllNeighborCells(start, x);
+                                openAllNeighborCells(end, x);
+                            }
+                        }
                     }
                 }
-                if (shipLength==4) {
-                    console.log(11);
-                    console.log(checkValue(10));
-                    checkFullOpened();
-                    console.log(22);
+
+                if (shipLength===3 &&(findInjuredTR(y,x)||findInjuredBL(y,x))) {
+                    if (horizShip) {
+                        for (var i = 0; i < width; i++) { //горизонтальная проверка
+                            start = 0;
+                            end = 0;
+                            if (data[y][i + 2] && (data[y][i] === 10) && (data[y][i + 1] === 10) && (data[y][i + 2] === 10)) {
+                                start = i;
+                                end = i + 2;
+                            }
+                            if (start && end) {
+                                openAllNeighborCells(y, start);
+                                openAllNeighborCells(y, end);
+                            }
+                        }
+                    }
+                    if (vertShip) {
+                        for (var j = 0; j < height; j++) { //вертикальная проверка
+                            start = 0;
+                            end = 0;
+                            if (data[j + 2][x] && (data[j][x] === 10) && (data[j + 1][x] === 10) && (data[j + 2][x] === 10)) {
+                                start = j;
+                                end = j + 2;
+                            }
+                            if (start && end) {
+                                openAllNeighborCells(start, x);
+                                openAllNeighborCells(end, x);
+                            }
+                        }
+                    }
                 }
+                if (shipLength===4 &&(findInjuredTR(y,x)||findInjuredBL(y,x))) {
+                    if (horizShip) {
+                        for (var i = 0; i < width; i++) { //горизонтальная проверка
+                            start = 0;
+                            end = 0;
+                            if (data[y][i + 3] && (data[y][i] === 10) && (data[y][i + 1] === 10) && (data[y][i + 2] === 10) && (data[y][i + 3] === 10)) {
+                                start = i;
+                                end = i + 3;
+                            }
+                            if (start && end) {
+                                openAllNeighborCells(y, start);
+                                openAllNeighborCells(y, end);
+                            }
+                        }
+                    }
+                    if (vertShip) {
+                        for (var j = 0; j < height; j++) { //вертикальная проверка
+                            start = 0;
+                            end = 0;
+                            if ((data[j + 3][x]) && (data[j][x] === 10) && (data[j + 1][x] === 10) && (data[j + 2][x] === 10) && (data[j + 3][x] === 10)) {
+                                start = j;
+                                end = j + 3;
+                            }
+                            if (start && end) {
+                                openAllNeighborCells(start, x);
+                                openAllNeighborCells(end, x);
+                            }
+                        }
+                    }
+                }
+
+
+/////////////////////////////////////////////////////////////////
+
 
             }
-///////=================
-//             else {
-//                 data[y][x]=10;
-//                 if (value===2 && findInjured(y,x)) {
-//                     openNeighborCells(y,x);
-//                     if (vertical) {
-//                         console.log('vert');
-//                         openNeighborCells(y+vertical, x);
-//                     }
-//                     if (horizontal) {
-//                         console.log('horiz');
-//                         openNeighborCells(y, x+horizontal);
-//                     }
-//
-//                 }
-//             }
-///////=================
 
-            //if 2 neighboring cells are opened
+            //if 2 neighbor cells are opened
             if ( countNeighborOpened()==2
                 &&(findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
                 if (vertShip) {
@@ -525,8 +590,8 @@ window.onload  = function () {
                 }
             }
 
-            //if 1 neighboring cell is opened
-            if (shipLength >2) {
+            //if 1 neighbor cell is opened
+            if (shipLength >1) {
                 data[y][x]=10;
                 if ( (findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
                     if (vertShip) {
@@ -550,136 +615,15 @@ window.onload  = function () {
         }
 
 
-        //     for (var j=0; j<width; j++) {
-        //         for (var i = 0; i < height; i++) {
-        //             horizShip = 1;
-        //             vertShip = 0;
-        //             if (checkValue(10)) {
-        //                 openAllNeighborCells(y+j, x+i);
-        //             }
-        //         }
-        //     }
-        //
-        //
-        //                if (vertShip) {
-        //                 for (var i = 0; i < height; i++) {
-        //                     if (checkValue(10)) {
-        //                         openAllNeighborCells(y+i,x);
-        //                     }
-        //                 }
-        //             }
-        // }
-
-
-        // if ((shipLength >2) && findInjuredTR(y,x)) {
-            //     if (vertShip) {
-            //         openAllNeighborCells(y+vertShip, x);
-            //     }
-            //     if (horizShip) {
-            //         openAllNeighborCells(y, x+horizShip);
-            //     }
-            // }
-
-   /////////////////////////////////////////////////
-   //              if (findInjuredTR(y,x)) {
-   //                  if (vertShip) {
-   //                      if(data[y+vertShip] && data[y+vertShip][x] === 10) {
-   //                          openLeftRightCells(y+vertShip,x);
-   //                          openLeftRightCells(y,x);
-   //                      }
-   //                  }
-   //                  if (horizShip) {
-   //                      if(data[y] && data[y][x+horizShip] === 10) {
-   //                          openTopBotCells(y,x);
-   //                          openTopBotCells(y,x+horizShip);
-   //                      }
-   //                  }
-   //              }
-
-                //              ///////////////////////////
-   //              // var count1 = 0;
-   //              // var count2 = 0;
-   //              // // horizontal check
-   //              // if (horizShip) {
-   //              //     for (var i=0; i<width; i++) {
-   //              //         if (data[y][i] === 10) {
-   //              //             count1++;
-   //              //         }
-   //              //     }
-   //              // }
-   //              //
-   //              // // vertical check
-   //              // if (vertShip) {
-   //              //     for (var j=0; j<height; j++) {
-   //              //         if (arr[j][x] === 1) {
-   //              //             count2++;
-   //              //         }
-   //              //     }
-   //              // }
-               ////////////////////////////////
-
-/////////////////////////////////////////////////////////
-//                 if (shipLength===3) {
-//                     if (shipLength===3 && findInjuredTR(y,x)) {
-//                         if (vertShip) {
-//                             if(data[y+vertShip]
-//                                 && data[y+(vertShip*2)]
-//                                 && data[y+vertShip][x] === 10
-//                                 && data[y+(vertShip*2)][x] === 10) {
-//                                     openLeftRightCells(y,x);
-//                                     openLeftRightCells(y+vertShip,x);
-//                                     openLeftRightCells(y+(vertShip*2),x);
-//                             }
-//                         }
-//                         if (horizShip) {
-//                             if(data[y]
-//                                 && data[y][x+horizShip] === 10
-//                                 && data[y][x+(horizShip*2)] === 10) {
-//                                     openTopBotCells(y,x);
-//                                     openTopBotCells(y,x+horizShip);
-//                                     openTopBotCells(y,x+(horizShip*2));
-//                             }
-//                         }
-//                     }
-//                 }
-/////////////////////////////////////////////////////////////////
-        // check for full-opened ship
-        function checkFullOpened() {
-            console.log('in');
-            for (var i = 0; i < height; i++) {
-                horizShip = 0;
-                vertShip = 1;
-                if (data[i][x]
-                    && countNeighborOpened(i, x) === 1
-                    && countNeighborOpened(i + 1, x) === 2
-                    && countNeighborOpened(i + 2, x) === 2) {
-                    openAllNeighborCells(i + 1, x);
-                    openAllNeighborCells(i + 4, x);
-                }
-            }
-            for (var i = 0; i < width; i++) {
-                horizShip = 1;
-                vertShip = 0;
-                if (data[y][i]
-                    && countNeighborOpened(y, i) === 1
-                    && countNeighborOpened(y, i + 1) === 2
-                    && countNeighborOpened(y, i + 2) === 2) {
-                    openAllNeighborCells(y, i + 1);
-                    openAllNeighborCells(y, i + 4);
-                }
-            }
-
-        }
-
         function countNeighborOpened() {
             count = 0;
             if(data[y-1] && data[y-1][x] === 10) {
                 count++;
             }
-            if(data[y] && data[y][x-1] === 10) {
+            if(data[y][x-1] && data[y][x-1] === 10) {
                 count++;
             }
-            if(data[y] && data[y][x+1] === 10) {
+            if(data[y][x+1] && data[y][x+1] === 10) {
                 count++;
             }
             if(data[y+1] && data[y+1][x] === 10) {
@@ -688,60 +632,22 @@ window.onload  = function () {
             return count;
         }
 
-    function checkValue(value) {
-        if (data[y][x] === value) {
-            if (shipLength===4) {
-                if (horizShip
-                    && data[y][x+3]===value
-                    && data[y][x+2]===value
-                    && data[y][x+1]===value) {
-                    return true;
-                }
-                if (vertShip
-                    && data[y + 3]
-                    && data[y + 3][x]===value
-                    && data[y + 2][x]===value
-                    && data[y + 1][x]===value) {
-                    return true;
-                }
-            }
-            if (shipLength===3) {
-                if (horizShip
-                    && data[y][x+2]===value
-                    && data[y][x+1]===value) {
-                    return true;
-                }
-                if (vertShip
-                    && data[y + 2]
-                    && data[y + 2][x]===value
-                    && data[y + 1][x]===value) {
-                    return true;
-                }
-            }
-            if (shipLength===2) {
-                if (horizShip
-                    && data[y][x+1]===value) {
-                    return true;
-                }
-                if (vertShip
-                    && data[y + 1]
-                    && data[y + 1][x]===value) {
-                    return true;
-                }
-            }
-            if (shipLength===1)     return true;
-            return false;
-        }
-        return false;
-    }
 
         function openLeftRightCells(yy,xx) {
-            divGameRows.childNodes[yy].childNodes[xx+1].innerHTML ='&#8226;';
-            divGameRows.childNodes[yy].childNodes[xx-1].innerHTML ='&#8226;';
+            if (divGameRows.childNodes[yy].childNodes[xx+1]) {
+                divGameRows.childNodes[yy].childNodes[xx+1].innerHTML ='&#8226;';
+            }
+            if (divGameRows.childNodes[yy].childNodes[xx-1]) {
+                divGameRows.childNodes[yy].childNodes[xx-1].innerHTML ='&#8226;';
+            }
         }
         function openTopBotCells(yy,xx) {
-            divGameRows.childNodes[yy+1].childNodes[xx].innerHTML ='&#8226;';
-            divGameRows.childNodes[yy-1].childNodes[xx].innerHTML ='&#8226;';
+            if (divGameRows.childNodes[yy+1]) {
+                divGameRows.childNodes[yy+1].childNodes[xx].innerHTML ='&#8226;';
+            }
+            if (divGameRows.childNodes[yy-1]) {
+                divGameRows.childNodes[yy-1].childNodes[xx].innerHTML ='&#8226;';
+            }
         }
 
         //top-right
@@ -789,6 +695,17 @@ window.onload  = function () {
             return false;
         }
 
+        function countOpened() {
+            var rez=0;
+            for (var i=0; i<width; i++) {
+                for (j=0; j<height; j++) {
+                    if (data[i][j]===10) {
+                        rez += data[i][j];
+                    }
+                }
+            }
+            return rez;
+        }
 
         function openAllNeighborCells(yy,xx) {
             if(data[yy-1] && data[yy-1][xx-1] === 0) {
@@ -817,12 +734,16 @@ window.onload  = function () {
             }
         }
 
-        if (opened===maxCells) {
-            h42.innerHTML ="Все корабли открыты! Конец игры.";
-            divGame.removeEventListener("click", shootings);
+        h42.innerHTML = "Остаток палуб для открытия: " + +(maxCells-(countOpened()/10));
+        if (opened>=maxCells) {
+            if ((countOpened()/10) === maxCells) {
+                h42.innerHTML ="Все корабли открыты! Конец игры.";
+                divGame.removeEventListener("click", shootings);
+            }
         }
 
         console.table(data);
+
 
     }
 
