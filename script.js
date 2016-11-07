@@ -101,7 +101,7 @@ window.onload  = function () {
                 data[i][j] = 0;// -
             }
         }
-        console.table( data );
+        //console.table( data );
     }
 
 
@@ -150,7 +150,6 @@ window.onload  = function () {
                 y = index;
             }
         });
-        //console.log('hovered: строка='+y+', ячейка='+x);
     }
 
 
@@ -295,7 +294,7 @@ window.onload  = function () {
                     showShipsOnTheField();
                 }
         }
-        console.table(data);
+        //console.table(data);
         if (!checkAvailableShip(shipLength) && shipLength) {  // no free ships of selected type
             divHarbor.childNodes[4-shipLength].classList.add('disabled');
             divGame.classList.remove('hover');
@@ -461,7 +460,6 @@ window.onload  = function () {
         var vertShip = 0;
         var horizShip = 0;
         var count = 0;
-        console.log('y=' + y + ', x=' + x);
 
         if (shipLength > 0) {
             cell.innerText = 'X';
@@ -473,6 +471,41 @@ window.onload  = function () {
             }
             else {
                 data[y][x]=10;
+
+                //if 2 neighbor cells are opened
+                if ( countNeighborOpened()==2
+                    &&(findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
+                    if (vertShip) {
+                        openLeftRightCells(y,x);
+                        openLeftRightCells(y+1, x);
+                        openLeftRightCells(y-1, x);
+                    }
+                    if (horizShip) {
+                        openTopBotCells(y,x);
+                        openTopBotCells(y, x+1);
+                        openTopBotCells(y, x-1);
+                    }
+                }
+
+                //if 1 neighbor cell is opened
+                if (shipLength >1) {
+                    data[y][x]=10;
+                    if ( (findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
+                        if (vertShip) {
+                            openLeftRightCells(y,x);
+                            if (data[y+vertShip][x]=10)  {
+                                openLeftRightCells(y+vertShip, x);
+                            }
+                        }
+                        if (horizShip) {
+                            openTopBotCells(y,x);
+                            if (data[y][x+horizShip]=10)  {
+                                openTopBotCells(y, x+horizShip);
+                            }
+                        }
+                    }
+                }
+
 /////////////////////////////////////////////////////////
                 var start = 0;
                 var end = 0;
@@ -482,13 +515,17 @@ window.onload  = function () {
                         for (var i = 0; i < width; i++) { //горизонтальная проверка
                             start = 0;
                             end = 0;
-                            if ((data[y][i + 1] === 10) && (data[y][i + 1] === 10)) {
-                                start = i;
-                                end = i + 1;
+                            if (data[y][i + 1]) {
+                                if ((data[y][i] === 10) && (data[y][i + 1] === 10)) {
+                                    start = i;
+                                    end = i + 1;
+                                }
                             }
-                            if (start && end) {
-                                openAllNeighborCells(y, start);
-                                openAllNeighborCells(y, end);
+                            if (start || start===0) {
+                                if (end) {
+                                    openAllNeighborCells(y, start);
+                                    openAllNeighborCells(y, end);
+                                }
                             }
                         }
                     }
@@ -496,13 +533,17 @@ window.onload  = function () {
                         for (var j = 0; j < height; j++) { //вертикальная проверка
                             start = 0;
                             end = 0;
-                            if (data[j + 1][x] && (data[j][x] === 10) && (data[j + 1][x] === 10)) {
-                                start = j;
-                                end = j + 1;
+                            if (data[j + 1]) {
+                                if ((data[j][x] === 10) && (data[j + 1][x] === 10)) {
+                                    start = j;
+                                    end = j + 1;
+                                }
                             }
-                            if (start && end) {
-                                openAllNeighborCells(start, x);
-                                openAllNeighborCells(end, x);
+                            if (start || start===0) {
+                                if (end) {
+                                    openAllNeighborCells(start, x);
+                                    openAllNeighborCells(end, x);
+                                }
                             }
                         }
                     }
@@ -513,27 +554,35 @@ window.onload  = function () {
                         for (var i = 0; i < width; i++) { //горизонтальная проверка
                             start = 0;
                             end = 0;
-                            if (data[y][i + 2] && (data[y][i] === 10) && (data[y][i + 1] === 10) && (data[y][i + 2] === 10)) {
-                                start = i;
-                                end = i + 2;
+                            if (data[y][i + 2]) {
+                                if ((data[y][i] === 10) && (data[y][i + 1] === 10) && (data[y][i + 2] === 10)) {
+                                    start = i;
+                                    end = i + 2;
+                                }
                             }
-                            if (start && end) {
-                                openAllNeighborCells(y, start);
-                                openAllNeighborCells(y, end);
+                            if (start || start===0) {
+                                if (end) {
+                                    openAllNeighborCells(y, start);
+                                    openAllNeighborCells(y, end);
+                                }
                             }
                         }
                     }
                     if (vertShip) {
-                        for (var j = 0; j < height; j++) { //вертикальная проверка
+                        for (var j = 0; j<height; j++) { //вертикальная проверка
                             start = 0;
                             end = 0;
-                            if (data[j + 2][x] && (data[j][x] === 10) && (data[j + 1][x] === 10) && (data[j + 2][x] === 10)) {
-                                start = j;
-                                end = j + 2;
+                            if (data[j + 2]) {
+                                if ((data[j][x] === 10) && (data[j + 1][x] === 10) && (data[j + 2][x] === 10)) {
+                                    start = j;
+                                    end = j + 2;
+                                }
                             }
-                            if (start && end) {
-                                openAllNeighborCells(start, x);
-                                openAllNeighborCells(end, x);
+                            if (start || start===0) {
+                                if (end) {
+                                    openAllNeighborCells(start, x);
+                                    openAllNeighborCells(end, x);
+                                }
                             }
                         }
                     }
@@ -543,13 +592,18 @@ window.onload  = function () {
                         for (var i = 0; i < width; i++) { //горизонтальная проверка
                             start = 0;
                             end = 0;
-                            if (data[y][i + 3] && (data[y][i] === 10) && (data[y][i + 1] === 10) && (data[y][i + 2] === 10) && (data[y][i + 3] === 10)) {
-                                start = i;
-                                end = i + 3;
+                            if (data[y][i + 3]) {
+                                if ((data[y][i] === 10) && (data[y][i + 1] === 10) && (data[y][i + 2] === 10) && (data[y][i + 3] === 10)) {
+                                    start = i;
+                                    end = i + 3;
+                                }
+
                             }
-                            if (start && end) {
-                                openAllNeighborCells(y, start);
-                                openAllNeighborCells(y, end);
+                            if (start || start===0) {
+                                if (end) {
+                                    openAllNeighborCells(y, start);
+                                    openAllNeighborCells(y, end);
+                                }
                             }
                         }
                     }
@@ -557,13 +611,17 @@ window.onload  = function () {
                         for (var j = 0; j < height; j++) { //вертикальная проверка
                             start = 0;
                             end = 0;
-                            if ((data[j + 3][x]) && (data[j][x] === 10) && (data[j + 1][x] === 10) && (data[j + 2][x] === 10) && (data[j + 3][x] === 10)) {
-                                start = j;
-                                end = j + 3;
+                            if (data[j + 3]) {
+                                if ((data[j][x] === 10) && (data[j + 1][x] === 10) && (data[j + 2][x] === 10) && (data[j + 3][x] === 10)) {
+                                    start = j;
+                                    end = j + 3;
+                                }
                             }
-                            if (start && end) {
-                                openAllNeighborCells(start, x);
-                                openAllNeighborCells(end, x);
+                            if (start || start===0) {
+                                if (end) {
+                                    openAllNeighborCells(start, x);
+                                    openAllNeighborCells(end, x);
+                                }
                             }
                         }
                     }
@@ -571,44 +629,7 @@ window.onload  = function () {
 
 
 /////////////////////////////////////////////////////////////////
-
-
             }
-
-            //if 2 neighbor cells are opened
-            if ( countNeighborOpened()==2
-                &&(findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
-                if (vertShip) {
-                    openLeftRightCells(y,x);
-                    openLeftRightCells(y+1, x);
-                    openLeftRightCells(y-1, x);
-                }
-                if (horizShip) {
-                    openTopBotCells(y,x);
-                    openTopBotCells(y, x+1);
-                    openTopBotCells(y, x-1);
-                }
-            }
-
-            //if 1 neighbor cell is opened
-            if (shipLength >1) {
-                data[y][x]=10;
-                if ( (findInjuredTR(y,x)||findInjuredBL(y,x)) ) {
-                    if (vertShip) {
-                        openLeftRightCells(y,x);
-                        if (data[y+vertShip][x]=10)  {
-                            openLeftRightCells(y+vertShip, x);
-                        }
-                    }
-                    if (horizShip) {
-                        openTopBotCells(y,x);
-                        if (data[y][x+horizShip]=10)  {
-                            openTopBotCells(y, x+horizShip);
-                        }
-                    }
-                }
-            }
-
         }
         else {
             cell.innerHTML ='&#8226;'  ;
@@ -708,29 +729,47 @@ window.onload  = function () {
         }
 
         function openAllNeighborCells(yy,xx) {
-            if(data[yy-1] && data[yy-1][xx-1] === 0) {
-                divGameRows.childNodes[yy-1].childNodes[xx-1].innerHTML ='&#8226;';
+            if (data[yy-1]) {
+                if (data[xx-1]) {
+                    if(data[yy-1][xx-1] === 0) {
+                        divGameRows.childNodes[yy-1].childNodes[xx-1].innerHTML ='&#8226;';
+                    }
+                }
+                if (data[xx]) {
+                    if (data[yy - 1][xx] === 0) {
+                        divGameRows.childNodes[yy - 1].childNodes[xx].innerHTML = '&#8226;';
+                    }
+                }
+                if (data[xx+1]) {
+                    if (data[yy-1][xx+1] === 0) {
+                        divGameRows.childNodes[yy-1].childNodes[xx+1].innerHTML ='&#8226;';
+                    }
+                }
             }
-            if(data[yy-1] && data[yy-1][xx] === 0) {
-                divGameRows.childNodes[yy-1].childNodes[xx].innerHTML ='&#8226;';
+            if (data[xx-1]) {
+                if (data[yy][xx-1] === 0) {
+                    divGameRows.childNodes[yy].childNodes[xx-1].innerHTML ='&#8226;';
+                }
             }
-            if(data[yy-1] && data[yy-1][xx+1] === 0) {
-                divGameRows.childNodes[yy-1].childNodes[xx+1].innerHTML ='&#8226;';
+            if (data[xx+1]) {
+                if (data[yy] && data[yy][xx+1] === 0) {
+                    divGameRows.childNodes[yy].childNodes[xx+1].innerHTML ='&#8226;';
+                }
             }
-            if(data[yy] && data[yy][xx-1] === 0) {
-                divGameRows.childNodes[yy].childNodes[xx-1].innerHTML ='&#8226;';
-            }
-            if(data[yy] && data[yy][xx+1] === 0) {
-                divGameRows.childNodes[yy].childNodes[xx+1].innerHTML ='&#8226;';
-            }
-            if(data[yy+1] && data[yy+1][xx-1] === 0) {
-                divGameRows.childNodes[yy+1].childNodes[xx-1].innerHTML ='&#8226;';
-            }
-            if(data[yy+1] && data[yy+1][xx] === 0) {
-                divGameRows.childNodes[yy+1].childNodes[xx].innerHTML ='&#8226;';
-            }
-            if(data[yy+1] && data[yy+1][xx+1] === 0) {
-                divGameRows.childNodes[yy+1].childNodes[xx+1].innerHTML ='&#8226;';
+            if (data[yy+1]) {
+                if (data[xx-1]) {
+                    if (data[yy+1][xx-1] === 0) {
+                        divGameRows.childNodes[yy+1].childNodes[xx-1].innerHTML ='&#8226;';
+                    }
+                }
+                if (data[yy+1][xx] === 0) {
+                    divGameRows.childNodes[yy+1].childNodes[xx].innerHTML ='&#8226;';
+                }
+                if (data[xx+1]) {
+                    if (data[yy+1][xx+1] === 0) {
+                        divGameRows.childNodes[yy+1].childNodes[xx+1].innerHTML ='&#8226;';
+                    }
+                }
             }
         }
 
