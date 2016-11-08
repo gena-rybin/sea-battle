@@ -25,19 +25,13 @@ window.onload  = function () {
     var opened = 0;
     var maxCells = 20;
 
-    //style settings
-    htmlA = "<style>";
-    htmlB = ".wrapper {display: inline-block;}";
-    htmlC = "</style>";
-
-
 
 
     // element constructor
     h1.innerHTML = '#06 task';
     h2.innerHTML = 'Морской бой';
 
-    var divWrapper = div.cloneNode(false)
+    var divWrapper = div.cloneNode(false);
     divWrapper.className = 'wrapper';
 
     var divGame = div.cloneNode(false);
@@ -70,14 +64,13 @@ window.onload  = function () {
     var divShipCell = div.cloneNode(false);
     divShipCell.classList.add("shipCell");
 
-    h41.innerHTML = 'Для начала расстановки кораблей кликните на любой корабль в правой части страницы'
+    h41.innerHTML = 'Для начала расстановки кораблей кликните на любой корабль в правой части страницы';
     buttonRun.innerText = 'Начать игру';
     buttonRun.classList.add('disabled');
 
 
 
 // page loading
-    body.insertAdjacentHTML("afterBegin", htmlA+htmlB+htmlC); //add my js-<styles> to index.html
     body.appendChild(h1);
     body.appendChild(h2);
     body.appendChild(divWrapper);
@@ -153,9 +146,8 @@ window.onload  = function () {
     }
 
 
-    divGame.onmouseover = function(event) {
+    divGame.onmouseover = function() {
         getPosition();
-        var cell = event.target;
         if (horiz===true  && checkCellForValue(0) && checkNeighborShips()) {
             for (var i=0; i<shipLength; i++) {
                     divGameRows.childNodes[y].childNodes[x+i].classList.add("hover");
@@ -224,7 +216,7 @@ window.onload  = function () {
         var cell = event.target;
         cell.classList.remove("hover");
         if (horiz==true) {
-            for (var i=1; i<shipLength; i++) {
+            for (i=1; i<shipLength; i++) {
                 if (divGameRows.childNodes[y].childNodes[x+i]) {
                     divGameRows.childNodes[y].childNodes[x+i].classList.remove("hover");
                 }
@@ -274,8 +266,7 @@ window.onload  = function () {
 
     // set ship on the game's field
     divGame.addEventListener("click", putShip);
-    function putShip(event) {
-        var cell = event.target;
+    function putShip() {
         if ( horiz==true
             && checkCellForValue(0)
             && checkNeighborShips()
@@ -289,7 +280,7 @@ window.onload  = function () {
             && checkCellForValue(0)
             && checkNeighborShips()
             && checkAvailableShip(shipLength)) {
-                for (var i = 0; i < shipLength; i++) {
+                for (i = 0; i < shipLength; i++) {
                     data[y + i][x] = shipLength;
                     showShipsOnTheField();
                 }
@@ -439,7 +430,7 @@ window.onload  = function () {
 
 
     buttonRun.addEventListener("click", startShootings);
-    function startShootings(event) {
+    function startShootings() {
         while (divGameRows.hasChildNodes()) {		// empty game field
             divGameRows.removeChild(divGameRows.lastChild);
         }
@@ -551,7 +542,7 @@ window.onload  = function () {
 
                 if (shipLength===3 &&(findInjuredTR(y,x)||findInjuredBL(y,x))) {
                     if (horizShip) {
-                        for (var i = 0; i < width; i++) { //горизонтальная проверка
+                        for (i = 0; i < width; i++) { //горизонтальная проверка
                             start = 0;
                             end = 0;
                             if (data[y][i + 2]) {
@@ -569,7 +560,7 @@ window.onload  = function () {
                         }
                     }
                     if (vertShip) {
-                        for (var j = 0; j<height; j++) { //вертикальная проверка
+                        for (j = 0; j<height; j++) { //вертикальная проверка
                             start = 0;
                             end = 0;
                             if (data[j + 2]) {
@@ -589,7 +580,7 @@ window.onload  = function () {
                 }
                 if (shipLength===4 &&(findInjuredTR(y,x)||findInjuredBL(y,x))) {
                     if (horizShip) {
-                        for (var i = 0; i < width; i++) { //горизонтальная проверка
+                        for (i = 0; i < width; i++) { //горизонтальная проверка
                             start = 0;
                             end = 0;
                             if (data[y][i + 3]) {
@@ -608,7 +599,7 @@ window.onload  = function () {
                         }
                     }
                     if (vertShip) {
-                        for (var j = 0; j < height; j++) { //вертикальная проверка
+                        for (j = 0; j < height; j++) { //вертикальная проверка
                             start = 0;
                             end = 0;
                             if (data[j + 3]) {
